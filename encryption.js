@@ -1,8 +1,7 @@
 const crypto = require('crypto');
-const readline = require('readline');
 
-// Secret key for AES-256 (32 bytes)
-const SECRET_KEY = crypto.randomBytes(32);
+// Fixed secret key (32 bytes for AES-256)
+const SECRET_KEY = crypto.createHash('sha256').update('my-secret-password').digest();
 const IV_LENGTH = 16;
 
 // Function to encrypt text
@@ -24,31 +23,22 @@ function decrypt(encryptedText) {
   return decrypted;
 }
 
-// Command-line interface
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+// Texts to encrypt
+const texts = [
+  "Hello World",
+  "Mutoni",
+  "Node.js is awesome!"
+];
 
-rl.question('Enter "e" to encrypt or "d" to decrypt: ', (mode) => {
-  if (mode === 'e') {
-    rl.question('Enter text to encrypt: ', (text) => {
-      const encrypted = encrypt(text);
-      console.log(`Encrypted text: ${encrypted}`);
-      rl.close();
-    });
-  } else if (mode === 'd') {
-    rl.question('Enter text to decrypt: ', (text) => {
-      try {
-        const decrypted = decrypt(text);
-        console.log(`Decrypted text: ${decrypted}`);
-      } catch (err) {
-        console.log('Error: Invalid encrypted text');
-      }
-      rl.close();
-    });
-  } else {
-    console.log('Invalid option. Use "e" to encrypt or "d" to decrypt.');
-    rl.close();
-  }
-});
+// Encrypt all texts
+const encryptedTexts = texts.map(t => encrypt(t));
+
+// Decrypt all texts
+const decryptedTexts = encryptedTexts.map(t => decrypt(t));
+
+// Output results
+console.log("===== ENCRYPTED TEXTS =====");
+encryptedTexts.forEach((t, i) => console.log(`${i + 1}: ${t}`));
+
+console.log("\n===== DECRYPTED TEXTS =====");
+decryptedTexts.forEach((t, i) => console.log(`${i + 1}: ${t}`));
